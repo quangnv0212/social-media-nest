@@ -1,0 +1,17 @@
+services:
+  mongodb:
+    image: mongo:5.0.15
+    environment:
+      - MONGO_INITDB_ROOT_USERNAME=root
+      - MONGO_INITDB_ROOT_PASSWORD=123456
+
+    container_name: mongodb
+    ports:
+      - 27017:27017
+    volumes:
+      - mongodb_data_container:/data/db
+
+volumes:
+  mongodb_data_container:
+
+# docker compose -p social-media-nestjs up -d
