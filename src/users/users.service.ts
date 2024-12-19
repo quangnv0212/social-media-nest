@@ -5,7 +5,7 @@ import {
 } from '@/exceptions/user.exception';
 import { hashPasswordHelper } from '@/helpers/utils';
 import { faker } from '@faker-js/faker';
-import { HttpStatus, Injectable } from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import aqp from 'api-query-params';
 import mongoose, { Model } from 'mongoose';
