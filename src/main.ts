@@ -13,7 +13,7 @@ async function bootstrap() {
   // Get the HTTP adapter host
   const httpAdapter = app.get(HttpAdapterHost);
   // Apply the global exception filter
-  app.useGlobalFilters(new AllExceptionsFilter(httpAdapter));
+  // app.useGlobalFilters(new AllExceptionsFilter(httpAdapter));
 
   const configService = app.get(ConfigService);
   const port = configService.get('PORT') ?? 3000;

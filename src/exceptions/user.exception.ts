@@ -1,13 +1,19 @@
-import { HttpException, HttpStatus } from '@nestjs/common';
+import { BadRequestException } from '@nestjs/common';
 
-export class UserNotFoundException extends HttpException {
+export class UserNotFoundException extends BadRequestException {
   constructor(id: string) {
-    super(`User with id ${id} not found`, HttpStatus.NOT_FOUND);
+    super(`User with id ${id} not found`);
   }
 }
 
-export class UserExistsException extends HttpException {
+export class UserExistsException extends BadRequestException {
   constructor(email: string) {
-    super(`User with email ${email} already exists`, HttpStatus.BAD_REQUEST);
+    super(`User with email ${email} already exists`);
+  }
+}
+
+export class IdNotValidException extends BadRequestException {
+  constructor(id: string) {
+    super(`ID ${id} is not valid`);
   }
 }

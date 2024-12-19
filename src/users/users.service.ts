@@ -1,16 +1,17 @@
+import {
+  IdNotValidException,
+  UserExistsException,
+  UserNotFoundException,
+} from '@/exceptions/user.exception';
 import { hashPasswordHelper } from '@/helpers/utils';
-import { BadRequestException, Injectable } from '@nestjs/common';
+import { faker } from '@faker-js/faker';
+import { HttpStatus, Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import aqp from 'api-query-params';
-import { Model } from 'mongoose';
+import mongoose, { Model } from 'mongoose';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { User } from './schemas/user.schema';
-import { faker } from '@faker-js/faker';
-import {
-  UserNotFoundException,
-  UserExistsException,
-} from '@/exceptions/user.exception';
 @Injectable()
 export class UsersService {
   constructor(@InjectModel(User.name) private userModel: Model<User>) {}
@@ -79,19 +80,31 @@ export class UsersService {
     };
   }
 
-  async findOne(id: string) {
-    const user = await this.userModel.findById(id);
+  async findOne(email: string) {
+    const user = await this.userModel.findOne({ email });
+    if (!user) {
+      throw new UserNotFoundException(email);
+    }
+    return user;
+  }
+
+  async update(id: string, updateUserDto: UpdateUserDto) {
+    const user = await this.userModel.findByIdAndUpdate(id, updateUserDto);
     if (!user) {
       throw new UserNotFoundException(id);
     }
     return user;
   }
 
-  update(id: string, updateUserDto: UpdateUserDto) {
-    return this.userModel.findByIdAndUpdate(id, updateUserDto);
-  }
-
-  remove(id: string) {
-    return this.userModel.findByIdAndDelete(id);
+  async remove(id: string) {
+    const checkId = mongoose.Types.ObjectId.isValid(id);
+    if (!checkId) {
+      throw new IdNotValidException(id);
+    }
+    const user = await this.userModel.findByIdAndDelete(id);
+    if (!user) {
+      throw new UserNotFoundException(id);
+    }
+    return null;
   }
 }
