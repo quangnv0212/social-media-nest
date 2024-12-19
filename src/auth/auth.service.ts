@@ -1,12 +1,17 @@
-import { Injectable, UnauthorizedException } from '@nestjs/common';
+import { comparePasswordHelper } from '@/helpers/utils';
+import { User } from '@/users/schemas/user.schema';
+import { UsersService } from '@/users/users.service';
+import {
+  BadRequestException,
+  Injectable,
+  NotFoundException,
+  UnauthorizedException,
+} from '@nestjs/common';
+import { ConfigService } from '@nestjs/config';
 import { JwtService } from '@nestjs/jwt';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model, Types } from 'mongoose';
 import { RefreshToken } from './schemas/refresh-token.schema';
-import { User } from '@/users/schemas/user.schema';
-import { ConfigService } from '@nestjs/config';
-import { UsersService } from '@/users/users.service';
-import { comparePasswordHelper } from '@/helpers/utils';
 
 @Injectable()
 export class AuthService {
@@ -33,8 +38,11 @@ export class AuthService {
     const refreshToken = await this.createRefreshToken(user.id);
 
     return {
-      access_token: accessToken,
-      refresh_token: refreshToken.token,
+      message: 'Login successful',
+      result: {
+        access_token: accessToken,
+        refresh_token: refreshToken.token,
+      },
     };
   }
 
@@ -100,5 +108,34 @@ export class AuthService {
       { token },
       { isRevoked: true },
     );
+  }
+
+  async logout(refreshToken: string) {
+    if (!refreshToken) {
+      throw new BadRequestException('Refresh token is required');
+    }
+
+    try {
+      // Verify the refresh token is valid before revoking
+      await this.jwtService.verify(refreshToken, {
+        secret: this.configService.get('JWT_REFRESH_SECRET'),
+      });
+
+      // Revoke the refresh token
+      await this.revokeRefreshToken(refreshToken);
+      return {
+        message: 'Logout successful',
+      };
+    } catch (error) {
+      throw new UnauthorizedException('Invalid refresh token');
+    }
+  }
+  async getProfile(email: string) {
+    const user = await this.usersService.findOne(email);
+    if (!user) {
+      throw new NotFoundException('User not found');
+    }
+    const { password, ...result } = user.toObject();
+    return result;
   }
 }

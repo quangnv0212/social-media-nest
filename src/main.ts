@@ -7,12 +7,6 @@ import { AppModule } from './app.module';
 
 async function bootstrap() {
   const app = await NestFactory.create<NestExpressApplication>(AppModule);
-
-  // Get the HTTP adapter host
-  const httpAdapter = app.get(HttpAdapterHost);
-  // Apply the global exception filter
-  // app.useGlobalFilters(new AllExceptionsFilter(httpAdapter));
-
   const configService = app.get(ConfigService);
   const port = configService.get('PORT') ?? 3000;
 
