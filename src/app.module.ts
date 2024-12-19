@@ -11,9 +11,6 @@ import { UsersModule } from './users/users.module';
     ConfigModule.forRoot({
       isGlobal: true,
     }),
-    // DevtoolsModule.register({
-    //   http: process.env.NODE_ENV !== 'production',
-    // }),
     MongooseModule.forRootAsync({
       imports: [ConfigModule],
       useFactory: async (configService: ConfigService) => ({

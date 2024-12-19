@@ -5,7 +5,7 @@ import {
 } from '@/exceptions/user.exception';
 import { hashPasswordHelper } from '@/helpers/utils';
 import { faker } from '@faker-js/faker';
-import { Injectable } from '@nestjs/common';
+import { Injectable, HttpStatus } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import aqp from 'api-query-params';
 import mongoose, { Model } from 'mongoose';
@@ -106,5 +106,27 @@ export class UsersService {
       throw new UserNotFoundException(id);
     }
     return null;
+  }
+
+  async updateAvatar(userId: string, filename: string) {
+    const checkId = mongoose.Types.ObjectId.isValid(userId);
+    if (!checkId) {
+      throw new IdNotValidException(userId);
+    }
+
+    const avatarUrl = `${process.env.APP_URL}/uploads/avatars/${filename}`;
+    const user = await this.userModel
+      .findByIdAndUpdate(userId, { avatar: avatarUrl }, { new: true })
+      .select('-password');
+
+    if (!user) {
+      throw new UserNotFoundException(userId);
+    }
+
+    return {
+      statusCode: HttpStatus.OK,
+      message: 'Update avatar successfully',
+      user,
+    };
   }
 }

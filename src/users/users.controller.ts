@@ -8,10 +8,17 @@ import {
   Post,
   Put,
   Query,
+  UploadedFile,
+  UseInterceptors,
+  UseGuards,
+  Request,
 } from '@nestjs/common';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { UsersService } from './users.service';
+import { FileInterceptor } from '@nestjs/platform-express';
+import { multerConfig } from '@/config/multer.config';
+import { JwtAuthGuard } from '@/auth/jwt-auth.guard';
 
 @Controller('users')
 export class UsersController {
@@ -60,5 +67,18 @@ export class UsersController {
   @Post('create-users')
   createUsers() {
     return this.usersService.createUsers();
+  }
+
+  @Post('upload-avatar')
+  @UseGuards(JwtAuthGuard)
+  @UseInterceptors(FileInterceptor('avatar', multerConfig))
+  async uploadAvatar(
+    @UploadedFile() file: Express.Multer.File,
+    @Request() req,
+  ) {
+    console.log(req.user);
+
+    const userId = req.user.userId;
+    return this.usersService.updateAvatar(userId, file.filename);
   }
 }
