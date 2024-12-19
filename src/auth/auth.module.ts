@@ -6,6 +6,9 @@ import { AuthController } from './auth.controller';
 import { AuthService } from './auth.service';
 import { JwtStrategy } from './jwt.strategy';
 import { LocalStrategy } from './local.strategy';
+import { RefreshTokenSchema } from './schemas/refresh-token.schema';
+import { RefreshToken } from './schemas/refresh-token.schema';
+import { MongooseModule } from '@nestjs/mongoose';
 
 @Module({
   controllers: [AuthController],
@@ -23,6 +26,9 @@ import { LocalStrategy } from './local.strategy';
       }),
       inject: [ConfigService],
     }),
+    MongooseModule.forFeature([
+      { name: RefreshToken.name, schema: RefreshTokenSchema },
+    ]),
   ],
 })
 export class AuthModule {}
