@@ -1,21 +1,24 @@
 import {
-  Controller,
-  Get,
-  Post,
   Body,
-  Patch,
-  Param,
+  Controller,
   Delete,
-  UseGuards,
-  Request,
-  Query,
+  Get,
   HttpStatus,
+  Param,
+  Post,
   Put,
+  Query,
+  Request,
+  UploadedFiles,
+  UseGuards,
+  UseInterceptors,
 } from '@nestjs/common';
-import { PostsService } from './posts.service';
-import { CreatePostDto } from './dto/create-post.dto';
+import { FilesInterceptor } from '@nestjs/platform-express';
 import { JwtAuthGuard } from '../auth/jwt-auth.guard';
+import { postMulterConfig } from '../config/post-multer.config';
+import { CreatePostDto } from './dto/create-post.dto';
 import { UpdatePostDto } from './dto/update-post.dto';
+import { PostsService } from './posts.service';
 
 @Controller('posts')
 @UseGuards(JwtAuthGuard)
@@ -23,13 +26,13 @@ export class PostsController {
   constructor(private readonly postsService: PostsService) {}
 
   @Post()
-  async create(@Request() req, @Body() createPostDto: CreatePostDto) {
-    const post = await this.postsService.create(req.user.userId, createPostDto);
-    return {
-      status: HttpStatus.CREATED,
-      message: 'Post created successfully',
-      data: post,
-    };
+  @UseInterceptors(FilesInterceptor('media', 10, postMulterConfig))
+  async create(
+    @Request() req,
+    @Body() createPostDto: CreatePostDto,
+    @UploadedFiles() files: Express.Multer.File[],
+  ) {
+    return this.postsService.create(req.user.userId, createPostDto, files);
   }
 
   @Post('dummy')

@@ -18,9 +18,10 @@ export class UsersService {
   async createUsers() {
     const listNewUsers: CreateUserDto[] = [];
     for (let i = 0; i < 10; i++) {
+      const hashPassword = await hashPasswordHelper('123456');
       listNewUsers.push({
         email: faker.internet.email(),
-        password: '123456',
+        password: hashPassword,
         name: faker.person.fullName(),
       });
     }

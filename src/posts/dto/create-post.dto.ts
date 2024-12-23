@@ -1,19 +1,4 @@
-import {
-  IsString,
-  IsNotEmpty,
-  IsArray,
-  IsOptional,
-  IsEnum,
-  IsUrl,
-} from 'class-validator';
-
-export class MediaDto {
-  @IsUrl()
-  url: string;
-
-  @IsEnum(['image', 'video'])
-  type: string;
-}
+import { IsArray, IsNotEmpty, IsOptional, IsString } from 'class-validator';
 
 export class CreatePostDto {
   @IsString()
@@ -22,5 +7,5 @@ export class CreatePostDto {
 
   @IsArray()
   @IsOptional()
-  media?: MediaDto[];
+  media?: Express.Multer.File[];
 }

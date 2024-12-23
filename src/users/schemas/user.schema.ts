@@ -16,6 +16,39 @@ export class User extends Document {
 
   @Prop({ default: faker.image.avatar() })
   avatar: string;
+
+  @Prop({ default: faker.image.avatar() })
+  cover: string;
+
+  @Prop({ default: faker.date.birthdate() })
+  birthdate: Date;
+
+  @Prop({ default: faker.location.country() })
+  country: string;
+
+  @Prop({ default: faker.location.city() })
+  city: string;
+
+  @Prop({ default: faker.location.state() })
+  state: string;
+
+  @Prop({ default: faker.location.zipCode() })
+  zipCode: string;
+
+  @Prop({ default: faker.phone.imei() })
+  phone: string;
+
+  @Prop({ default: faker.lorem.paragraph() })
+  bio: string;
+
+  @Prop({ default: faker.lorem.paragraph() })
+  skills: string;
+
+  @Prop({ default: faker.lorem.paragraph() })
+  education: string;
+
+  @Prop({ default: faker.lorem.paragraph() })
+  experience: string;
 }
 
 export const UserSchema = SchemaFactory.createForClass(User);

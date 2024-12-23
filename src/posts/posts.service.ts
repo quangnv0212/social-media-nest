@@ -15,12 +15,26 @@ export class PostsService {
     private interactionModel: Model<PostInteraction>,
   ) {}
 
-  async create(userId: Types.ObjectId, createPostDto: CreatePostDto) {
+  async create(
+    userId: Types.ObjectId,
+    createPostDto: CreatePostDto,
+    files: Express.Multer.File[],
+  ) {
+    const media = files?.map((file) => ({
+      url: `${process.env.APP_URL}/uploads/posts/${file.filename}`,
+      type: file.mimetype.startsWith('image/') ? 'image' : 'video',
+    }));
+
     const post = await this.postModel.create({
       ...createPostDto,
       userId,
+      media,
     });
-    return post;
+
+    return {
+      message: 'Post created successfully',
+      data: post,
+    };
   }
   async createDummyPosts(userId: Types.ObjectId) {
     const postContent = {
