@@ -10,12 +10,6 @@ export const postMulterConfig = {
     },
   }),
   fileFilter: (req, file, callback) => {
-    if (!file.originalname.match(/\.(JPG|JPEG|PNG|GIF|MP4|MOV|AVI)$/)) {
-      return callback(
-        new Error('Only image and video files are allowed!'),
-        false,
-      );
-    }
     callback(null, true);
   },
   limits: {

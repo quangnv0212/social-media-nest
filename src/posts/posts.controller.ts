@@ -50,8 +50,9 @@ export class PostsController {
     @Query('query') query: string,
     @Query('page') page: number,
     @Query('limit') limit: number,
+    @Request() req,
   ) {
-    return this.postsService.findAll(query, page, limit);
+    return this.postsService.findAll(query, page, limit, req.user.userId);
   }
 
   @Get(':id')

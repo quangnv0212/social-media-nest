@@ -45,11 +45,12 @@ export class PostsService {
     return post;
   }
 
-  async findAll(query: string, page = 1, limit = 10) {
-    const { filter, sort, projection, population } = aqp(query);
+  async findAll(query: string, page = 1, limit = 10, currentUserId?: string) {
+    const { filter, sort, projection } = aqp(query);
     delete filter.currentPage;
     delete filter.pageSize;
     const skip = (page - 1) * limit;
+
     const posts = await this.postModel
       .find(filter)
       .sort(sort as any)
@@ -63,7 +64,34 @@ export class PostsService {
       .populate('recentBookmarks.userId', 'name avatar')
       .exec();
 
-    const total = await this.postModel.countDocuments();
+    const total = await this.postModel.countDocuments(filter);
+
+    // If currentUserId is provided, check interactions for each post
+    if (currentUserId) {
+      const postsWithInteractions = await Promise.all(
+        posts.map(async (post) => {
+          const isLiked = await this.checkUserInteraction(
+            post._id.toString(),
+            currentUserId,
+            'like',
+          );
+          return {
+            ...post.toJSON(),
+            isLiked,
+          };
+        }),
+      );
+
+      return {
+        data: postsWithInteractions,
+        meta: {
+          total,
+          page,
+          limit,
+          totalPages: Math.ceil(total / limit),
+        },
+      };
+    }
 
     return {
       data: posts,
@@ -190,7 +218,7 @@ export class PostsService {
 
   async checkUserInteraction(
     postId: string,
-    userId: Types.ObjectId,
+    userId: string,
     type: 'like' | 'share' | 'bookmark',
   ) {
     const interaction = await this.interactionModel.findOne({
@@ -198,6 +226,8 @@ export class PostsService {
       userId,
       type,
     });
+    console.log(interaction);
+
     return !!interaction;
   }
 

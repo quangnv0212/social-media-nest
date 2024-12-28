@@ -38,11 +38,8 @@ export class AuthService {
     const refreshToken = await this.createRefreshToken(user.id);
 
     return {
-      message: 'Login successful',
-      result: {
-        access_token: accessToken,
-        refresh_token: refreshToken.token,
-      },
+      access_token: accessToken,
+      refresh_token: refreshToken.token,
     };
   }
 
