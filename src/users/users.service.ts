@@ -5,26 +5,38 @@ import {
 } from '@/exceptions/user.exception';
 import { hashPasswordHelper } from '@/helpers/utils';
 import { faker } from '@faker-js/faker';
-import { Injectable, HttpStatus } from '@nestjs/common';
+import { Injectable, HttpStatus, NotFoundException } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import aqp from 'api-query-params';
 import mongoose, { Model } from 'mongoose';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { User } from './schemas/user.schema';
+import { Role } from '@/auth/enums/role.enum';
 @Injectable()
 export class UsersService {
   constructor(@InjectModel(User.name) private userModel: Model<User>) {}
   async createUsers() {
     const listNewUsers: CreateUserDto[] = [];
-    for (let i = 0; i < 10; i++) {
+    for (let i = 0; i < 5; i++) {
       const hashPassword = await hashPasswordHelper('123456');
       listNewUsers.push({
         email: faker.internet.email(),
         password: hashPassword,
         name: faker.person.fullName(),
+        role: Role.STUDENT,
       });
     }
+    for (let i = 0; i < 5; i++) {
+      const hashPassword = await hashPasswordHelper('123456');
+      listNewUsers.push({
+        email: faker.internet.email(),
+        password: hashPassword,
+        name: faker.person.fullName(),
+        role: Role.TEACHER,
+      });
+    }
+
     return this.userModel.insertMany(listNewUsers);
   }
 
@@ -48,10 +60,15 @@ export class UsersService {
     query: string,
     currentPage?: string | number,
     limit?: string | number,
+    excludeRole?: Role,
   ) {
     const { filter, sort, projection, population } = aqp(query);
     delete filter.currentPage;
     delete filter.pageSize;
+
+    if (excludeRole) {
+      filter.role = { $ne: excludeRole };
+    }
 
     const page = Number(currentPage) || 1;
     const pageSize = Number(limit) || 10;
@@ -82,11 +99,16 @@ export class UsersService {
   }
 
   async findOne(email: string) {
-    const user = await this.userModel.findOne({ email });
-    if (!user) {
-      throw new UserNotFoundException(email);
+    try {
+      const user = await this.userModel.findOne({ email });
+      if (!user) {
+        throw new NotFoundException(`User with email ${email} not found`);
+      }
+      return user;
+    } catch (error) {
+      console.error('FindOne error:', error);
+      throw error;
     }
-    return user;
   }
 
   async update(id: string, updateUserDto: UpdateUserDto) {

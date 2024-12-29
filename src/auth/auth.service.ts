@@ -33,14 +33,25 @@ export class AuthService {
   }
 
   async login(user: User) {
-    const payload = { email: user.email, sub: user.id };
-    const accessToken = this.jwtService.sign(payload);
-    const refreshToken = await this.createRefreshToken(user.id);
+    try {
+      const payload = {
+        email: user.email,
+        sub: user.id,
+        role: user.role,
+      };
+      console.log('Login Payload:', payload); // Debug log
 
-    return {
-      access_token: accessToken,
-      refresh_token: refreshToken.token,
-    };
+      const accessToken = this.jwtService.sign(payload);
+      const refreshToken = await this.createRefreshToken(user.id);
+
+      return {
+        access_token: accessToken,
+        refresh_token: refreshToken.token,
+      };
+    } catch (error) {
+      console.error('Login error:', error);
+      throw error;
+    }
   }
 
   private async createRefreshToken(
@@ -90,6 +101,7 @@ export class AuthService {
       const accessToken = this.jwtService.sign({
         email: user.email,
         sub: user.id,
+        role: user.role,
       });
 
       return {

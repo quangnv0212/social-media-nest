@@ -1,6 +1,7 @@
 import { PartialType } from '@nestjs/mapped-types';
 import { CreateUserDto } from './create-user.dto';
 import { IsMongoId, IsNotEmpty, IsOptional } from 'class-validator';
+import { Role } from '@/auth/enums/role.enum';
 
 export class UpdateUserDto extends PartialType(CreateUserDto) {
   @IsMongoId({ message: 'ID is justified by MongoId' })
@@ -20,5 +21,5 @@ export class UpdateUserDto extends PartialType(CreateUserDto) {
   password?: string;
 
   @IsOptional()
-  role?: string;
+  role?: Role;
 }
