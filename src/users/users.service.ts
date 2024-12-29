@@ -60,14 +60,14 @@ export class UsersService {
     query: string,
     currentPage?: string | number,
     limit?: string | number,
-    excludeRole?: Role,
+    excludeRole?: Role[],
   ) {
     const { filter, sort, projection, population } = aqp(query);
     delete filter.currentPage;
     delete filter.pageSize;
 
     if (excludeRole) {
-      filter.role = { $ne: excludeRole };
+      filter.role = { $nin: excludeRole };
     }
 
     const page = Number(currentPage) || 1;
@@ -109,6 +109,9 @@ export class UsersService {
       console.error('FindOne error:', error);
       throw error;
     }
+  }
+  async findOneById(id: string) {
+    return this.userModel.findById(id);
   }
 
   async update(id: string, updateUserDto: UpdateUserDto) {

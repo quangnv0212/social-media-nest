@@ -1,28 +1,27 @@
+import { JwtAuthGuard } from '@/auth/jwt-auth.guard';
+import { multerConfig } from '@/config/multer.config';
 import {
   Body,
   Controller,
   Delete,
   Get,
-  HttpStatus,
   Param,
   Post,
   Put,
   Query,
-  UploadedFile,
-  UseInterceptors,
-  UseGuards,
   Request,
   UnauthorizedException,
+  UploadedFile,
+  UseGuards,
+  UseInterceptors,
 } from '@nestjs/common';
+import { FileInterceptor } from '@nestjs/platform-express';
+import { Roles } from '../auth/decorators/roles.decorator';
+import { Role } from '../auth/enums/role.enum';
+import { RolesGuard } from '../auth/guards/roles.guard';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { UsersService } from './users.service';
-import { FileInterceptor } from '@nestjs/platform-express';
-import { multerConfig } from '@/config/multer.config';
-import { JwtAuthGuard } from '@/auth/jwt-auth.guard';
-import { RolesGuard } from '../auth/guards/roles.guard';
-import { Roles } from '../auth/decorators/roles.decorator';
-import { Role } from '../auth/enums/role.enum';
 
 @Controller('users')
 @UseGuards(JwtAuthGuard, RolesGuard)
@@ -50,30 +49,33 @@ export class UsersController {
     @Request() req,
   ) {
     if (req.user.role === Role.TEACHER) {
-      return this.usersService.findAll(
-        query,
-        currentPage,
-        pageSize,
+      return this.usersService.findAll(query, currentPage, pageSize, [
         Role.TEACHER,
-      );
+        Role.ADMIN,
+      ]);
     }
     return this.usersService.findAll(query, currentPage, pageSize);
   }
 
   @Get(':id')
-  findOne(@Param('id') id: string) {
-    return {
-      statusCode: HttpStatus.OK,
-      message: 'Get user successfully',
-      user: this.usersService.findOne(id),
-    };
+  @Roles(Role.ADMIN, Role.TEACHER)
+  async findOne(@Param('id') id: string, @Request() req) {
+    if (req.user.role === Role.TEACHER) {
+      const userToFind = await this.usersService.findOneById(id);
+      if (userToFind.role !== Role.STUDENT) {
+        throw new UnauthorizedException('Teachers can only find students');
+      }
+    }
+    return this.usersService.findOneById(id);
   }
 
   @Put()
   @Roles(Role.ADMIN, Role.TEACHER)
   async update(@Body() updateUserDto: UpdateUserDto, @Request() req) {
     if (req.user.role === Role.TEACHER) {
-      const userToUpdate = await this.usersService.findOne(updateUserDto.id);
+      const userToUpdate = await this.usersService.findOneById(
+        updateUserDto.id,
+      );
       if (userToUpdate.role !== Role.STUDENT) {
         throw new UnauthorizedException('Teachers can only update students');
       }
@@ -85,7 +87,7 @@ export class UsersController {
   @Roles(Role.ADMIN, Role.TEACHER)
   async remove(@Param('id') id: string, @Request() req) {
     if (req.user.role === Role.TEACHER) {
-      const userToDelete = await this.usersService.findOne(id);
+      const userToDelete = await this.usersService.findOneById(id);
       if (userToDelete.role !== Role.STUDENT) {
         throw new UnauthorizedException('Teachers can only delete students');
       }
