@@ -43,18 +43,38 @@ export class UsersController {
   @Get()
   @Roles(Role.ADMIN, Role.TEACHER)
   findAll(
+    @Request() req,
     @Query() query: string,
     @Query('currentPage') currentPage: number,
     @Query('pageSize') pageSize: number,
-    @Request() req,
+    @Query('role') role?: Role,
+    @Query('search') search?: string,
+    @Query('sortBy') sortBy?: string,
+    @Query('sortOrder') sortOrder?: 'asc' | 'desc',
   ) {
     if (req.user.role === Role.TEACHER) {
-      return this.usersService.findAll(query, currentPage, pageSize, [
-        Role.TEACHER,
-        Role.ADMIN,
-      ]);
+      return this.usersService.findAll(
+        query,
+        currentPage,
+        pageSize,
+        [Role.TEACHER, Role.ADMIN],
+        role,
+        search,
+        sortBy,
+        sortOrder,
+      );
     }
-    return this.usersService.findAll(query, currentPage, pageSize);
+
+    return this.usersService.findAll(
+      query,
+      currentPage,
+      pageSize,
+      undefined,
+      role,
+      search,
+      sortBy,
+      sortOrder,
+    );
   }
 
   @Get(':id')

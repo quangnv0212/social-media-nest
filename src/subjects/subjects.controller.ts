@@ -14,6 +14,9 @@ import { CreateSubjectDto } from './dto/create-subject.dto';
 import { UpdateSubjectDto } from './dto/update-subject.dto';
 import { JwtAuthGuard } from '../auth/jwt-auth.guard';
 import { SubjectsService } from './subjects.service';
+import { EnrollUsersDto } from './dto/enroll-users.dto';
+import { Roles } from '../auth/decorators/roles.decorator';
+import { Role } from '../auth/enums/role.enum';
 
 @Controller('subjects')
 @UseGuards(JwtAuthGuard)
@@ -52,6 +55,18 @@ export class SubjectsController {
     );
   }
 
+  @Get('enrolled-users')
+  @Roles(Role.ADMIN, Role.TEACHER)
+  getEnrolledUsers(
+    @Query('role') role: Role,
+    @Query('subjectId') subjectId: string,
+  ) {
+    return this.subjectsService.getEnrolledUsers({
+      role,
+      subjectId,
+    });
+  }
+
   @Get(':id')
   findOne(@Param('id') id: string) {
     return this.subjectsService.findOne(id);
@@ -65,5 +80,17 @@ export class SubjectsController {
   @Delete(':id')
   remove(@Param('id') id: string) {
     return this.subjectsService.remove(id);
+  }
+
+  @Post(':id/enroll')
+  @Roles(Role.ADMIN)
+  enrollUsers(@Param('id') id: string, @Body() enrollUsersDto: EnrollUsersDto) {
+    return this.subjectsService.enrollUsers(id, enrollUsersDto.userIds);
+  }
+
+  @Get(':id/not-enrolled-users')
+  @Roles(Role.ADMIN)
+  getNotEnrolledUsers(@Param('id') id: string) {
+    return this.subjectsService.getNotEnrolledUsers(id);
   }
 }

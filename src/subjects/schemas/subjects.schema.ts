@@ -19,6 +19,12 @@ export class Subject extends Document {
 
   @Prop({ type: Types.ObjectId, ref: 'User', required: true })
   userId: Types.ObjectId;
+
+  @Prop({ type: [{ type: Types.ObjectId, ref: 'User' }], default: [] })
+  enrolledStudents: Types.ObjectId[];
+
+  @Prop({ type: [{ type: Types.ObjectId, ref: 'User' }], default: [] })
+  enrolledTeachers: Types.ObjectId[];
 }
 
 export const SubjectSchema = SchemaFactory.createForClass(Subject);

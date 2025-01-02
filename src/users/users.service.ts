@@ -61,19 +61,47 @@ export class UsersService {
     currentPage?: string | number,
     limit?: string | number,
     excludeRole?: Role[],
+    filterRole?: Role,
+    search?: string,
+    sortBy?: string,
+    sortOrder: 'asc' | 'desc' = 'asc',
   ) {
     const { filter, sort, projection, population } = aqp(query);
     delete filter.currentPage;
     delete filter.pageSize;
+    delete filter.role;
+    delete filter.search;
+    delete filter.sortBy;
+    delete filter.sortOrder;
 
+    // Handle role filtering
     if (excludeRole) {
       filter.role = { $nin: excludeRole };
+    }
+    if (filterRole) {
+      filter.role = filterRole;
+    }
+
+    // Handle search
+    if (search) {
+      filter.$or = [
+        { name: { $regex: search, $options: 'i' } },
+        { email: { $regex: search, $options: 'i' } },
+      ];
+    }
+
+    // Handle sorting
+    let sortOptions = sort;
+    if (sortBy) {
+      sortOptions = {
+        [sortBy]: sortOrder === 'desc' ? -1 : 1,
+      };
     }
 
     const page = Number(currentPage) || 1;
     const pageSize = Number(limit) || 10;
-
     const skip = (page - 1) * pageSize;
+
     const totalItems = await this.userModel.countDocuments(filter);
     const totalPages = Math.ceil(totalItems / pageSize);
 
@@ -81,7 +109,7 @@ export class UsersService {
       .find(filter)
       .skip(skip)
       .limit(pageSize)
-      .sort(sort as any)
+      .sort(sortOptions as any)
       .select(projection)
       .select('-password')
       .populate(population)
