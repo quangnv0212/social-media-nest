@@ -39,7 +39,6 @@ export class AuthService {
         sub: user.id,
         role: user.role,
       };
-      console.log('Login Payload:', payload); // Debug log
 
       const accessToken = this.jwtService.sign(payload);
       const refreshToken = await this.createRefreshToken(user.id);
@@ -107,7 +106,10 @@ export class AuthService {
       return {
         access_token: accessToken,
       };
-    } catch (error) {
+    } catch () {
+      console.log('====================================');
+      console.log(error);
+      console.log('====================================');
       throw new UnauthorizedException('Invalid refresh token');
     }
   }

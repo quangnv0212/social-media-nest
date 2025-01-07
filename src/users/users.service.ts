@@ -159,7 +159,9 @@ export class UsersService {
     if (!user) {
       throw new UserNotFoundException(id);
     }
-    return null;
+    return {
+      message: 'User deleted successfully',
+    };
   }
 
   async updateAvatar(userId: string, filename: string) {

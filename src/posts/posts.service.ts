@@ -226,7 +226,6 @@ export class PostsService {
       userId,
       type,
     });
-    console.log(interaction);
 
     return !!interaction;
   }

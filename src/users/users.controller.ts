@@ -5,6 +5,8 @@ import {
   Controller,
   Delete,
   Get,
+  HttpCode,
+  HttpStatus,
   Param,
   Post,
   Put,
@@ -104,6 +106,7 @@ export class UsersController {
   }
 
   @Delete(':id')
+  @HttpCode(HttpStatus.OK)
   @Roles(Role.ADMIN, Role.TEACHER)
   async remove(@Param('id') id: string, @Request() req) {
     if (req.user.role === Role.TEACHER) {
