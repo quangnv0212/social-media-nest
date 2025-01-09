@@ -40,7 +40,10 @@ export class AuthService {
         role: user.role,
       };
 
-      const accessToken = this.jwtService.sign(payload);
+      const accessToken = this.jwtService.sign(payload, {
+        // secret: this.configService.get('JWT_ACCESS_SECRET'),
+        expiresIn: '1d',
+      });
       const refreshToken = await this.createRefreshToken(user.id);
 
       return {
@@ -96,17 +99,20 @@ export class AuthService {
         throw new UnauthorizedException('Refresh token expired');
       }
 
-      const user = await this.usersService.findOne(payload.email);
+      const user = await this.usersService.findOneById(payload?.sub);
+
       const accessToken = this.jwtService.sign({
         email: user.email,
-        sub: user.id,
+        sub: user._id,
         role: user.role,
       });
+      const newrefreshToken = await this.createRefreshToken(user.id);
 
       return {
         access_token: accessToken,
+        refresh_token: newrefreshToken.token,
       };
-    } catch () {
+    } catch (error) {
       console.log('====================================');
       console.log(error);
       console.log('====================================');

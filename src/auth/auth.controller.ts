@@ -34,9 +34,9 @@ export class AuthController {
   }
 
   @UseGuards(JwtAuthGuard)
-  @Post('refresh')
+  @Post('refresh-token')
   @HttpCode(HttpStatus.OK)
-  refreshAccessToken(@Request() req, @Body() body: RefreshAccessTokenDto) {
+  refreshAccessToken(@Body() body: RefreshAccessTokenDto) {
     return this.authService.refreshAccessToken(body.refreshToken);
   }
 
