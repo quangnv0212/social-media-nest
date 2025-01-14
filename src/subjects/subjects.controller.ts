@@ -9,6 +9,7 @@ import {
   Query,
   UseGuards,
   Request,
+  Put,
 } from '@nestjs/common';
 import { CreateSubjectDto } from './dto/create-subject.dto';
 import { UpdateSubjectDto } from './dto/update-subject.dto';
@@ -72,9 +73,9 @@ export class SubjectsController {
     return this.subjectsService.findOne(id);
   }
 
-  @Patch(':id')
-  update(@Param('id') id: string, @Body() updateSubjectDto: UpdateSubjectDto) {
-    return this.subjectsService.update(id, updateSubjectDto);
+  @Put()
+  update(@Body() updateSubjectDto: UpdateSubjectDto) {
+    return this.subjectsService.update(updateSubjectDto);
   }
 
   @Delete(':id')

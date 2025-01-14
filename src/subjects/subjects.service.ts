@@ -80,10 +80,11 @@ export class SubjectsService {
     return subject;
   }
 
-  async update(id: string, updateSubjectDto: UpdateSubjectDto) {
-    const subject = await this.subjectModel
-      .findByIdAndUpdate(id, updateSubjectDto, { new: true })
-      .populate('userId', 'name email avatar');
+  async update(updateSubjectDto: UpdateSubjectDto) {
+    const { id, ...rest } = updateSubjectDto;
+    const subject = await this.subjectModel.findByIdAndUpdate(id, rest, {
+      new: true,
+    });
     if (!subject) {
       throw new NotFoundException('Subject not found');
     }
