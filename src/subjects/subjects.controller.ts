@@ -1,23 +1,22 @@
 import {
-  Controller,
-  Get,
-  Post,
   Body,
-  Patch,
-  Param,
+  Controller,
   Delete,
-  Query,
-  UseGuards,
-  Request,
+  Get,
+  Param,
+  Post,
   Put,
+  Query,
+  Request,
+  UseGuards,
 } from '@nestjs/common';
-import { CreateSubjectDto } from './dto/create-subject.dto';
-import { UpdateSubjectDto } from './dto/update-subject.dto';
-import { JwtAuthGuard } from '../auth/jwt-auth.guard';
-import { SubjectsService } from './subjects.service';
-import { EnrollUsersDto } from './dto/enroll-users.dto';
 import { Roles } from '../auth/decorators/roles.decorator';
 import { Role } from '../auth/enums/role.enum';
+import { JwtAuthGuard } from '../auth/jwt-auth.guard';
+import { CreateSubjectDto } from './dto/create-subject.dto';
+import { EnrollUsersDto } from './dto/enroll-users.dto';
+import { UpdateSubjectDto } from './dto/update-subject.dto';
+import { SubjectsService } from './subjects.service';
 
 @Controller('subjects')
 @UseGuards(JwtAuthGuard)
@@ -93,5 +92,11 @@ export class SubjectsController {
   @Roles(Role.ADMIN)
   getNotEnrolledUsers(@Param('id') id: string) {
     return this.subjectsService.getNotEnrolledUsers(id);
+  }
+
+  @Post('seed')
+  @Roles(Role.ADMIN)
+  async seedSubjects(@Request() req) {
+    return this.subjectsService.seedSubjects(req.user.userId);
   }
 }

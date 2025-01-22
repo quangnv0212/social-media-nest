@@ -216,4 +216,156 @@ export class SubjectsService {
 
     return notEnrolledUsers;
   }
+
+  async seedSubjects(userId: string) {
+    const subjects = await this.subjectModel.insertMany([
+      {
+        name: 'Mathematics Fundamentals',
+        description:
+          'Basic concepts of algebra, geometry, and calculus for beginners',
+        isActive: true,
+        price: 299,
+        userId,
+      },
+      {
+        name: 'Advanced Physics',
+        description:
+          'In-depth study of mechanics, thermodynamics, and quantum physics',
+        isActive: true,
+        price: 399,
+        userId,
+      },
+      {
+        name: 'English Literature',
+        description: 'Analysis of classic and contemporary literary works',
+        isActive: true,
+        price: 249,
+        userId,
+      },
+      {
+        name: 'World History',
+        description:
+          'Comprehensive study of major historical events and civilizations',
+        isActive: true,
+        price: 279,
+        userId,
+      },
+      {
+        name: 'Computer Science Basics',
+        description:
+          'Introduction to programming, algorithms, and data structures',
+        isActive: true,
+        price: 349,
+        userId,
+      },
+      {
+        name: 'Biology Essentials',
+        description: 'Study of living organisms, cells, and ecosystems',
+        isActive: true,
+        price: 289,
+        userId,
+      },
+      {
+        name: 'Chemistry 101',
+        description:
+          'Basic principles of atomic structure, chemical bonds, and reactions',
+        isActive: true,
+        price: 299,
+        userId,
+      },
+      {
+        name: 'Art History',
+        description: 'Survey of major art movements and influential artists',
+        isActive: true,
+        price: 259,
+        userId,
+      },
+      {
+        name: 'Economics Principles',
+        description: 'Understanding micro and macroeconomics concepts',
+        isActive: true,
+        price: 329,
+        userId,
+      },
+      {
+        name: 'Psychology Introduction',
+        description: 'Basic concepts of human behavior and mental processes',
+        isActive: true,
+        price: 279,
+        userId,
+      },
+      {
+        name: 'Music Theory',
+        description: 'Understanding rhythm, melody, harmony, and composition',
+        isActive: true,
+        price: 269,
+        userId,
+      },
+      {
+        name: 'Environmental Science',
+        description: 'Study of ecosystems, climate change, and sustainability',
+        isActive: true,
+        price: 289,
+        userId,
+      },
+      {
+        name: 'Spanish Language',
+        description: 'Basic to intermediate Spanish language skills',
+        isActive: true,
+        price: 299,
+        userId,
+      },
+      {
+        name: 'Digital Marketing',
+        description: 'Modern marketing strategies and social media management',
+        isActive: true,
+        price: 349,
+        userId,
+      },
+      {
+        name: 'Photography Basics',
+        description:
+          'Understanding camera functions and composition techniques',
+        isActive: true,
+        price: 279,
+        userId,
+      },
+      {
+        name: 'Creative Writing',
+        description: 'Developing fiction and non-fiction writing skills',
+        isActive: true,
+        price: 259,
+        userId,
+      },
+      {
+        name: 'Public Speaking',
+        description: 'Improving presentation and communication skills',
+        isActive: true,
+        price: 289,
+        userId,
+      },
+      {
+        name: 'Nutrition Science',
+        description: 'Understanding dietary needs and healthy eating habits',
+        isActive: true,
+        price: 269,
+        userId,
+      },
+      {
+        name: 'Web Development',
+        description: 'Learning HTML, CSS, and JavaScript fundamentals',
+        isActive: true,
+        price: 399,
+        userId,
+      },
+      {
+        name: 'Business Management',
+        description: 'Basic principles of organization and leadership',
+        isActive: true,
+        price: 349,
+        userId,
+      },
+    ]);
+    return subjects;
+  }
 }
