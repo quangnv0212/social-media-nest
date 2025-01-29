@@ -57,12 +57,21 @@ export class QuestionsService {
         .limit(limit)
         .populate('subjectId', 'name')
         .populate('createdBy', 'name email avatar')
+        .lean()
         .exec(),
       this.questionModel.countDocuments(query),
     ]);
 
+    const transformedQuestions = questions.map((question) => {
+      const { _id, __v, ...rest } = question;
+      return {
+        id: _id,
+        ...rest,
+      };
+    });
+
     return {
-      data: questions,
+      data: transformedQuestions,
       meta: {
         total,
         page,
@@ -76,13 +85,18 @@ export class QuestionsService {
     const question = await this.questionModel
       .findById(id)
       .populate('subjectId', 'name')
-      .populate('createdBy', 'name email avatar');
+      .populate('createdBy', 'name email avatar')
+      .lean();
 
     if (!question) {
       throw new NotFoundException('Question not found');
     }
 
-    return question;
+    const { _id, __v, ...rest } = question;
+    return {
+      id: _id,
+      ...rest,
+    };
   }
 
   async update(updateQuestionDto: UpdateQuestionDto) {

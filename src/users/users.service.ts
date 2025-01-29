@@ -25,6 +25,7 @@ export class UsersService {
         password: hashPassword,
         name: faker.person.fullName(),
         role: Role.STUDENT,
+        avatar: faker.image.avatarGitHub(),
       });
     }
     for (let i = 0; i < 5; i++) {
@@ -34,6 +35,7 @@ export class UsersService {
         password: hashPassword,
         name: faker.person.fullName(),
         role: Role.TEACHER,
+        avatar: faker.image.avatarGitHub(),
       });
     }
 
@@ -53,6 +55,7 @@ export class UsersService {
     return this.userModel.create({
       ...rest,
       password: hashPassword,
+      avatar: faker.image.avatarGitHub(),
     });
   }
 
@@ -74,11 +77,15 @@ export class UsersService {
     delete filter.sortBy;
     delete filter.sortOrder;
 
-    // Handle role filtering
+    // Always exclude admin role and combine with any other excluded roles
+    const rolesToExclude = [Role.ADMIN];
     if (excludeRole) {
-      filter.role = { $nin: excludeRole };
+      rolesToExclude.push(...excludeRole);
     }
-    if (filterRole) {
+    filter.role = { $nin: rolesToExclude };
+
+    // Override role filter if specific role is requested (except admin)
+    if (filterRole && filterRole !== Role.ADMIN) {
       filter.role = filterRole;
     }
 
